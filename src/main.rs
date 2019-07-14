@@ -8,7 +8,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     println!("{:?}", args);
 
-    let fileName = &args[0];
+    let fileName: &String = &args[1];
 
 //    let mut data:Vec<u32> = Vec::new();
     let mut data = String::new();
