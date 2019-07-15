@@ -2,11 +2,10 @@
 
 use std::env;
 use std::fs::File;
-use std::io::{BufReader, Read};
+use std::io::{BufReader, Read, BufWriter, Write};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    println!("{:?}", args);
 
     let fileName: &String = &args[1];
 
@@ -17,4 +16,8 @@ fn main() {
     let mut bufReader = BufReader::new(file);
     bufReader.read_to_string(&mut data).expect("Unable to read string");
     println!("{}", data);
+
+    let newFile = File::create("encrypted").expect("Unable to create file");
+    let mut newFile = BufWriter::new(newFile);
+    newFile.write_all(data.as_bytes()).expect("Unable to write data");
 }
