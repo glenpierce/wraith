@@ -6,13 +6,14 @@ use std::io::{BufReader, Read, BufWriter, Write};
 //use std::io::{BufReader, Read, BufWriter, Write, Cursor};
 
 
-//extern crate crypto;
-//extern crate rand;
-//extern crate aesstream;
-//
-//use crypto::aessafe::{AesSafe128Encryptor, AesSafe128Decryptor};
+extern crate crypto;
+extern crate rand;
+extern crate aesstream;
+
+use crypto::aessafe::{AesSafe128Encryptor, AesSafe128Decryptor};
 //use rand::{Rng, OsRng};
-//use aesstream::{AesWriter, AesReader};
+use aesstream::{AesWriter, AesReader};
+use rand::AsByteSliceMut;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -27,6 +28,18 @@ fn main() {
     let mut buf_reader = BufReader::new(file);
     buf_reader.read_to_end(&mut data).expect("Unable to read string");
     println!("{:?}", data);
+
+    let key:[u8; 16] = [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6];
+
+    let encryptor = AesSafe128Encryptor::new(&key);
+    let mut encrypted = Vec::new();
+    {
+        let mut writer = AesWriter::new(&mut encrypted, encryptor).expect("writer problem?");
+        writer.write_all(data.as_byte_slice_mut()).expect("Unable to write with encryptor");
+    }
+    println!("{:?}", encrypted);
+//    let mut writer = AesWriter::new(file, encryptor)?;
+//    writer.write_all("Hello World!".as_bytes())?;
 
     let new_file = File::create("encrypted").expect("Unable to create file");
     let mut new_file = BufWriter::new(new_file);
