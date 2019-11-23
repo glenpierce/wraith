@@ -11,7 +11,6 @@ extern crate rand;
 extern crate aesstream;
 
 use crypto::aessafe::{AesSafe128Encryptor, AesSafe128Decryptor};
-//use rand::{Rng, OsRng};
 use aesstream::{AesWriter, AesReader};
 use rand::AsByteSliceMut;
 
@@ -45,7 +44,31 @@ fn main() {
     let mut new_file = BufWriter::new(new_file);
     let mut pos = 0;
     while pos < data.len() {
-        let bytes_written = new_file.write(&data[pos..]).expect("unable to write to file");
+        let bytes_written = new_file.write(&encrypted[pos..]).expect("unable to write to file");
         pos += bytes_written;
     }
+
+    //open image file
+    let image_file_name: &String = &args[2];
+    println!("{}", image_file_name);
+
+    let mut image_data:Vec<u8> = Vec::new();
+
+    let image_file = File::open(image_file_name.as_str()).expect("Unable to open file");
+
+    let mut image_buf_reader = BufReader::new(image_file);
+    image_buf_reader.read_to_end(&mut image_data).expect("Unable to read string");
+    println!("{:?}", image_data);
+
+    for byte in image_data {
+        remove_least_significant_bit(&byte);
+    }
+
+    println!("{:?}", image_data);
+
+    fn remove_least_significant_bit(mut input: &u8) {
+        let mask:u8 = 0b1111_1110;
+        input = input & mask;
+    }
+
 }

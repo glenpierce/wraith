@@ -1,0 +1,10 @@
+[package]
+name = "wraith"
+version = "0.1.0"
+authors = ["Glen Pierce <glen.piercev@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+aes-stream = "0.2.1"
+rust-crypto = "0.2.36"
+rand = "0.7.2"
