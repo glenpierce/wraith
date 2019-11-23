@@ -8,16 +8,17 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     let fileName: &String = &args[1];
+    println!("{}", fileName);
 
-//    let mut data:Vec<u32> = Vec::new();
-    let mut data = String::new();
+    let mut data:Vec<u8> = Vec::new();
+//    let mut data = String::new();
     let file = File::open(fileName.as_str()).expect("Unable to open file");
 
     let mut bufReader = BufReader::new(file);
-    bufReader.read_to_string(&mut data).expect("Unable to read string");
-    println!("{}", data);
+    bufReader.read_to_end(&mut data).expect("Unable to read string");
+    println!("{:?}", data);
 
-    let newFile = File::create("encrypted").expect("Unable to create file");
-    let mut newFile = BufWriter::new(newFile);
-    newFile.write_all(data.as_bytes()).expect("Unable to write data");
+//    let newFile = File::create("encrypted").expect("Unable to create file");
+//    let mut newFile = BufWriter::new(newFile);
+//    newFile.write_all(data.as_bytes()).expect("Unable to write data");
 }
