@@ -60,15 +60,15 @@ fn main() {
     image_buf_reader.read_to_end(&mut image_data).expect("Unable to read string");
     println!("{:?}", image_data);
 
-    for byte in image_data {
-        remove_least_significant_bit(&byte);
+    for byte in image_data.iter_mut() {
+        remove_least_significant_bit(byte);
     }
 
     println!("{:?}", image_data);
 
-    fn remove_least_significant_bit(mut input: &u8) {
+    fn remove_least_significant_bit(mut input: &mut u8) {
         let mask:u8 = 0b1111_1110;
-        input = input & mask;
+        *input = *input & mask;
     }
 
 }
