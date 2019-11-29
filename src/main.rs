@@ -1,5 +1,7 @@
 //Steganography is the practice of concealing a file, message, image, or video within another file, message, image, or video. The word steganography combines the Greek words steganos (στεγανός), meaning "covered, concealed, or protected", and graphein (γράφειν) meaning "writing".
 
+//lossless .png can contain base64 encoded jpeg
+
 use std::env;
 use std::fs::File;
 use std::io::{BufReader, Read, BufWriter, Write};
@@ -64,11 +66,44 @@ fn main() {
         remove_least_significant_bit(byte);
     }
 
+    let mut iteration:usize = 0;
+    for mut byte in image_data.iter_mut() {
+        replace_least_significant_bit(byte, iteration, &encrypted);
+        iteration += 1;
+    }
+
     println!("{:?}", image_data);
 
     fn remove_least_significant_bit(mut input: &mut u8) {
         let mask:u8 = 0b1111_1110;
+//        let m = !1u8;
         *input = *input & mask;
+    }
+
+    fn replace_least_significant_bit(host: &mut u8, iteration:usize, inserted_bytes:&[u8]) {
+        if iteration >= inserted_bytes.len() {
+            return;
+        }
+        let position_in_byte:u8 = (iteration % 8) as u8;
+        let position_in_byte_array:usize = (iteration / 8) as usize;
+        let bit_to_insert:bool = get_bit_at(inserted_bytes[position_in_byte_array], position_in_byte);
+
+        let mask:u8 = if bit_to_insert {
+            0b1111_1111
+        } else {
+            0b1111_1110
+        };
+
+        *host = *host | mask;
+        //control where we are mutating, try to avoid dereferencing by returning this
+    }
+
+    fn get_bit_at(input: u8, n: u8) -> bool {
+        if n < 8 {
+            input & (1 << n) != 0
+        } else {
+            false
+        }
     }
 
 }
