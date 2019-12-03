@@ -86,6 +86,15 @@ fn main() {
         newData.push(nextBit);
     }
     println!("{:?}", newData); //AWESOME! The bits are there... they're kind of backwards, but they're THERE!
+
+//    let new_image = File::create("encryptedImage.png").expect("Unable to create file");
+//    let mut new_image = BufWriter::new(new_image);
+//    let mut pos = 0;
+//    let image_data_length = image_data.len();
+//    while pos < image_data_length {
+//        let bytes_written = new_image.write(&image_data[pos..]).expect("unable to write to file");
+//        pos += bytes_written;
+//    }
 }
 
 fn remove_least_significant_bit(mut input: &mut u8) {
