@@ -38,6 +38,7 @@ fn main() {
         let mut writer = AesWriter::new(&mut encrypted, encryptor).expect("writer problem?");
         writer.write_all(data.as_byte_slice_mut()).expect("Unable to write with encryptor");
     }
+    println!("{}", "encrypted file data");
     println!("{:?}", encrypted);
 //    let mut writer = AesWriter::new(file, encryptor)?;
 //    writer.write_all("Hello World!".as_bytes())?;
@@ -66,44 +67,58 @@ fn main() {
         remove_least_significant_bit(byte);
     }
 
+    println!("{}", "least significant bit removed from image file");
+    println!("{:?}", image_data);
+
     let mut iteration:usize = 0;
     for mut byte in image_data.iter_mut() {
         replace_least_significant_bit(byte, iteration, &encrypted);
         iteration += 1;
     }
 
+    println!("{}", "encrypted data injected");
     println!("{:?}", image_data);
 
-    fn remove_least_significant_bit(mut input: &mut u8) {
-        let mask:u8 = 0b1111_1110;
-//        let m = !1u8;
-        *input = *input & mask;
+    println!("{}", "least significant bit from new image data");
+    let mut newData:Vec<u8> = Vec::new();
+    for byte in image_data {
+        let nextBit:u8 = get_bit_at(byte, 0);
+        newData.push(nextBit);
     }
+    println!("{:?}", newData); //AWESOME! The bits are there... they're kind of backwards, but they're THERE!
+}
 
-    fn replace_least_significant_bit(host: &mut u8, iteration:usize, inserted_bytes:&[u8]) {
-        if iteration >= inserted_bytes.len() {
-            return;
-        }
-        let position_in_byte:u8 = (iteration % 8) as u8;
-        let position_in_byte_array:usize = (iteration / 8) as usize;
-        let bit_to_insert:bool = get_bit_at(inserted_bytes[position_in_byte_array], position_in_byte);
+fn remove_least_significant_bit(mut input: &mut u8) {
+    let mask:u8 = 0b1111_1110; // let m = !1u8;
+    *input = *input & mask;
+}
 
-        let mask:u8 = if bit_to_insert {
-            0b1111_1111
+fn replace_least_significant_bit(host: &mut u8, iteration:usize, inserted_bytes:&[u8]) {
+    if iteration >= inserted_bytes.len() {
+        return;
+    }
+    let position_in_byte:u8 = (iteration % 8) as u8;
+    let position_in_byte_array:usize = (iteration / 8) as usize;
+    let bit_to_insert:u8 = get_bit_at(inserted_bytes[position_in_byte_array], position_in_byte);
+
+    if bit_to_insert > 0 {
+        *host = bit_twiddling(*host, 0);
+    }
+}
+
+fn get_bit_at(input: u8, n: u8) -> u8 {
+    if n < 8 {
+        if input & (1 << n) != 0 {
+            1
         } else {
-            0b1111_1110
-        };
-
-        *host = *host | mask;
-        //control where we are mutating, try to avoid dereferencing by returning this
-    }
-
-    fn get_bit_at(input: u8, n: u8) -> bool {
-        if n < 8 {
-            input & (1 << n) != 0
-        } else {
-            false
+            0
         }
+    } else {
+        0
     }
+}
 
+fn bit_twiddling(original: u8, bit: u8) -> u8 {
+    let mask = 1 << bit;
+    return original | mask;
 }
